@@ -12,7 +12,20 @@ module Courier
     end
 
     def user_check(request)
-      not_found
+      signature = UserSignatureService.find(request)
+      signature ? found(signature) : not_found
+    end
+
+    def found(signature)
+      [
+        200,
+        {
+          'Content-Type' => 'application/json'
+        },
+        [
+          '{ "status": "found" }'
+        ]
+      ]
     end
 
     def not_found

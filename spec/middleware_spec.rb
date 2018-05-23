@@ -84,6 +84,21 @@ RSpec.describe Courier::Middleware do
           expect(response[0]).to eq(404)
         end
       end
+
+      context 'when courier can identify the user' do
+        let(:environment) do
+          {
+            "PATH_INFO" => "/courier/check",
+            "HTTP_USER_AGENT" => iphone_user_agent,
+          }
+        end
+
+        it 'responds with success' do
+          expect(Courier::UserSignatureService).to receive(:find).and_return(double('signature'))
+          response = Courier::Middleware.new(application, options).call(environment)
+          expect(response[0]).to eq(200)
+        end
+      end
     end
   end
 end
