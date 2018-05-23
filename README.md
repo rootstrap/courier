@@ -24,35 +24,52 @@ Or install it yourself as:
 The courier gem adds a middleware that handles the deep link redirection and user identification either before it reaches your application.
 
 To configure add the middleware to your stack wherever it makes more sense for you.
-Options you can provide are:
+Options you can provide to the configuration blocks are:
 
 - *deep_link_base*: _required_ This is the name of your mobile app to redirect the deep links.
 - *mounted_as: Default*: _optional_ Default(courier). This are the mounted url for currier links.
 
 ### Ruby On Rails
 
-`config.middleware.use Courier::Middleware, deep_link_base: '<your_mobile_app_name>', mounted_as: '<your_courier_links_directory>'`
+Add the following config block to an initializer
+
+```
+Courier.configure do |config|
+  config.deep_link_base = 'my-app' # required
+  # config.mounted_as = 'deep-links-base' # optional
+end
+```
+Add the middleware to your stack in `config/application.rb`
+
+```
+  config.middleware.use Courier::Middleware`
+```
 
 ### Other Rack Applications
 
-Courier is built on top of Rack so any Rack project can integrate it. Simply make sure you add `Courier::Middleware` to your rack stack.
+Courier is built on top of Rack so any Rack project can integrate it. Simply make sure you add `Courier::Middleware` to your rack stack and run the configure block when starting your server.
 
 ## Usage
 
 ### Deep linking to your app
+
 After set up simply send links to your users that match your `mounted_at` directory IE: http://yourdomain.com/courier/invite?friend_id=someid&invitation_id=otherid
 
 Users that follow the link from mobile phones will be redirected to a deep link with the form
 
 `<deep_link_base>://invite?friend_id=someid&invitation_id=otherid`
 
-On your mobile app handle the deep link as you please.
+This open to possible paths: *New users* (users that don't have your app), *Existing Users*
 
-### For new users
+### Existing users
+
+Nothing to do here. Just handle the deep link as you always do on your iOS or Android application
+
+### New users
 
 One of the challenges courier attempts to solve is the deep link surviving the install process.
-By default deeplinks will redirect the user to open your app or install it on the appropriate store.
-After downloading and installing your app, when they open the app they won't get the content they would have gotten if they followed the deeplink having the app installed the first time.
+By default deep links will redirect the user to open your app or install it on the appropriate store.
+After downloading and installing your app, when they open the app they won't get the content they would have gotten if they followed the deep link having the app installed the first time.
 To Handle that simply do this at some time when loading your app.
 
 Make a request
@@ -62,7 +79,7 @@ Make a request
 This request will respond with:
 
 - 404: When courier is unable to match the user with a user that followed a deep link recently
-- 200: JSON body response with the information of the request previoulsy done by the user.
+- 200: JSON body response with the information of the request previously done by the user.
 
 Sample response:
 

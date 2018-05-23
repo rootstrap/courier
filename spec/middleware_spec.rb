@@ -1,4 +1,10 @@
 RSpec.describe Courier::Middleware do
+  before :each do
+    Courier.configure do |config|
+      config.deep_link_base = 'my-app'
+    end
+  end
+
   describe '#call' do
     let(:iphone_user_agent) { 'Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3' }
     let(:web_user_agent) { 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36' }
@@ -80,5 +86,4 @@ RSpec.describe Courier::Middleware do
       end
     end
   end
-
 end
