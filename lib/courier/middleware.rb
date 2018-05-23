@@ -10,12 +10,30 @@ module Courier
         'webos|amoi|novarra|cdm|alcatel|pocket|ipad|iphone|mobileexplorer|' +
         'chtml|ericsson|minimo|mobile', true)
       @regex_mounted_at = options[:mounted_at] || /^\/courier\//
+      @regex_check = "#{@regex_mounted_at}check"
     end
 
     def call(env)
       request = Rack::Request.new(env)
       return deep_link_redirect(request) if require_redirect?(request)
+      return user_check(request) if check_request?(request)
       @app.call(env)
+    end
+
+    def user_check(request)
+      not_found
+    end
+
+    def not_found
+      [
+        404,
+        {
+          'Content-Type' => 'application/json'
+        },
+        [
+          '{ "status": "not_found" }'
+        ]
+      ]
     end
 
     def deep_link_redirect(request)
@@ -42,7 +60,11 @@ module Courier
     end
 
     def deep_link_request?(request)
-      request.path_info =~ @regex_mounted_at
+      request.path_info.match(@regex_mounted_at) && !check_request?(request)
+    end
+
+    def check_request?(request)
+      request.path_info.match(@regex_check)
     end
   end
 end

@@ -63,5 +63,22 @@ RSpec.describe Courier::Middleware do
         end
       end
     end
+
+    describe '#check action' do
+      context 'when courier can not identify the user' do
+        let(:environment) do
+          {
+            "PATH_INFO" => "/courier/check",
+            "HTTP_USER_AGENT" => web_user_agent,
+          }
+        end
+
+        it 'responds with not found' do
+          response = Courier::Middleware.new(application, options).call(environment)
+          expect(response[0]).to eq(404)
+        end
+      end
+    end
   end
+
 end
