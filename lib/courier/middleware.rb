@@ -14,11 +14,8 @@ module Courier
 
     def call(env)
       request = Rack::Request.new(env)
-      if deep_link_request?(request) && mobile_request?(request)
-        deep_link_redirect(request)
-      else
-        @app.call(env)
-      end
+      return deep_link_redirect(request) if require_redirect?(request)
+      @app.call(env)
     end
 
     def deep_link_redirect(request)
@@ -34,6 +31,10 @@ module Courier
         },
         []
       ]
+    end
+
+    def require_redirect?(request)
+      deep_link_request?(request) && mobile_request?(request)
     end
 
     def mobile_request?(request)
