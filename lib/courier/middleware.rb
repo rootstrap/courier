@@ -9,6 +9,7 @@ module Courier
         'pdxgw|netfront|xiino|vodafone|portalmmm|sagem|mot-|sie-|ipod|up\\.b|' +
         'webos|amoi|novarra|cdm|alcatel|pocket|ipad|iphone|mobileexplorer|' +
         'chtml|ericsson|minimo|mobile', true)
+      @regex_mounted_at = options[:mounted_at] || /^\/courier\//
     end
 
     def call(env)
@@ -21,7 +22,7 @@ module Courier
     end
 
     def deep_link_redirect(request)
-      fullpath = request.fullpath.gsub(/^\/courier\//,'')
+      fullpath = request.fullpath.gsub(@regex_mounted_at, '')
       location = "#{@deep_link_base}://#{fullpath}"
 
       [
@@ -40,7 +41,7 @@ module Courier
     end
 
     def deep_link_request?(request)
-      request.path_info =~ /^\/courier\//i
+      request.path_info =~ @regex_mounted_at
     end
   end
 end
